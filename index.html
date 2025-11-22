@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BankrollBot Studio – Betting Companion (Demo)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-soft: #020617;
+      --card: #020617;
+      --card-inner: #020617;
+      --accent: #22c55e;
+      --accent2: #06b6d4;
+      --accent-warm: #fbbf24;
+      --danger: #ef4444;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, #0f172a, #020617 60%),
+        radial-gradient(circle at bottom, #0b1120, #000 60%);
+      color: var(--text-main);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 18px 12px 32px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 520px;
+      background: linear-gradient(145deg, #020617dd, #020617f9);
+      border-radius: 20px;
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(148, 163, 184, 0.25);
+      overflow: hidden;
+      border: 1px solid rgba(15, 23, 42, 0.8);
+    }
+
+    /* HEADER */
+
+    .app-header {
+      padding: 14px 16px 10px;
+      background:
+        radial-gradient(circle at top left, #22c55e33, transparent 60%),
+        radial-gradient(circle at top right, #06b6d433, transparent 60%),
+        linear-gradient(135deg, #020617, #020617);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top, #22c55e, #16a34a, #020617);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.55);
+    }
+
+    .logo-text-main {
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+    }
+
+    .logo-text-sub {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #9ca3af;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(94, 234, 212, 0.9);
+      background: rgba(15, 23, 42, 0.8);
+      color: #a5f3fc;
+      white-space: nowrap;
+    }
+
+    .header-subrow {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+    }
+
+    .header-subrow-left {
+      color: #cbd5f5;
+    }
+
+    .header-subrow-right {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 0.7rem;
+      white-space: nowrap;
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .pill span.value {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* NAV TABS */
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 2px 9px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-muted);
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .tab-btn span.icon {
+      font-size: 1rem;
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .tab-btn.active::after {
+      content: "";
+      position: absolute;
+      left: 18%;
+      right: 18%;
+      bottom: 0;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(to right, #06b6d4, #22c55e);
+    }
+
+    /* MAIN CONTENT */
+
+    .content {
+      padding: 10px 12px 14px;
+      font-size: 0.9rem;
+      background: radial-gradient(circle at top, #020617, #020617);
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .hint {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 10px;
+      padding: 7px 9px;
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 8px;
+    }
+
+    .hint strong {
+      color: var(--accent-warm);
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin: 8px 2px 4px;
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    /* CARDS */
+
+    .card {
+      background: radial-gradient(circle at top, #020617, #020617);
+      border-radius: 14px;
+      padding: 10px 11px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
+      margin-bottom: 8px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .card-subtitle {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      font-size: 0.7rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(52, 211, 153, 0.9);
+      background: rgba(22, 163, 74, 0.2);
+      color: #bbf7d0;
+      white-space: nowrap;
+    }
+
+    .chip.neg {
+      border-color: rgba(248, 113, 113, 0.8);
+      background: rgba(127, 29, 29, 0.45);
+      color: #fecaca;
+    }
+
+    .card-body {
+      font-size: 0.8rem;
+      color: var(--text-main);
+      margin: 4px 0 6px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      border: none;
+      padding: 5px 11px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: linear-gradient(to right, #06b6d4, #22c55e);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(8, 145, 178, 0.5);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.08s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-primary span {
+      font-size: 0.9rem;
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(8, 145, 178, 0.8);
+      filter: brightness(0.95);
+    }
+
+    .btn-ghost {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 4px 9px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .mini-metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+      font-size: 0.78rem;
+      text-align: center;
+    }
+
+    .mini-metric-label {
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .mini-metric-value {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #e5e7eb;
+    }
+
+    .mini-metric-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    /* HOME BET LIST */
+
+    .bet-list {
+      margin-top: 6px;
+    }
+
+    .bet-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 5px;
+      padding-top: 4px;
+      border-top: 1px dashed var(--border-subtle);
+      font-size: 0.78rem;
+    }
+
+    .bet-main {
+      flex: 1;
+    }
+
+    .bet-title {
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .bet-sub {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+    }
+
+    .bet-meta {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .bet-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .tiny-btn {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 2px 6px;
+      font-size: 0.72rem;
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .tiny-btn.win {
+      border-color: rgba(34, 197, 94, 0.8);
+      color: #bbf7d0;
+    }
+
+    .tiny-btn.loss {
+      border-color: rgba(248, 113, 113, 0.8);
+      color: #fecaca;
+    }
+
+    .status-pill {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+    }
+
+    .status-pill.win {
+      border-color: rgba(34, 197, 94, 0.9);
+      color: #bbf7d0;
+      background: rgba(22, 163, 74, 0.25);
+    }
+
+    .status-pill.loss {
+      border-color: rgba(248, 113, 113, 0.9);
+      color: #fecaca;
+      background: rgba(127, 29, 29, 0.4);
+    }
+
+    /* FORMS */
+
+    .form-group {
+      margin-bottom: 8px;
+    }
+
+    .form-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+      display: block;
+    }
+
+    textarea,
+    input,
+    select {
+      width: 100%;
+      font-size: 0.82rem;
+      padding: 7px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      outline: none;
+      font-family: inherit;
+      background: #020617;
+      color: var(--text-main);
+    }
+
+    textarea::placeholder,
+    input::placeholder {
+      color: #6b7280;
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      border-color: #06b6d4;
+      box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.4);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    select {
+      background: #020617;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .form-row > * {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* ANALYZER */
+
+    .analyzer-result {
+      margin-top: 8px;
+    }
+
+    .analyzer-badge {
+      font-size: 0.78rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+    }
+
+    .analyzer-badge.good {
+      background: rgba(22, 163, 74, 0.25);
+      color: #bbf7d0;
+      border: 1px solid #4ade80;
+    }
+
+    .analyzer-badge.bad {
+      background: rgba(127, 29, 29, 0.65);
+      color: #fecaca;
+      border: 1px solid #fca5a5;
+    }
+
+    .analyzer-text {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: var(--text-main);
+    }
+
+    .analyzer-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 0.75rem;
+    }
+
+    .analyzer-metric-label {
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .analyzer-metric-value {
+      font-weight: 600;
+    }
+
+    /* PLANNER / ALERTS */
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+    }
+
+    .toggle-label {
+      flex: 1;
+      color: var(--text-muted);
+    }
+
+    .toggle-label strong {
+      color: var(--text-main);
+    }
+
+    .toggle-switch {
+      width: 36px;
+      height: 18px;
+      border-radius: 999px;
+      background: #111827;
+      border: 1px solid var(--border-subtle);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .toggle-switch::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: #6b7280;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .toggle-switch.on {
+      background: rgba(22, 163, 74, 0.35);
+      border-color: #22c55e;
+    }
+
+    .toggle-switch.on::after {
+      transform: translateX(14px);
+      background: #bbf7d0;
+    }
+
+    .alert-list {
+      margin-top: 6px;
+    }
+
+    .alert-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 0.8rem;
+      padding-top: 4px;
+      border-top: 1px dashed var(--border-subtle);
+      margin-top: 4px;
+    }
+
+    .alert-main {
+      flex: 1;
+    }
+
+    .alert-title {
+      font-weight: 600;
+      margin-bottom: 1px;
+    }
+
+    .alert-sub {
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      margin-bottom: 2px;
+    }
+
+    .alert-tag-row {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .alert-chip {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(31, 41, 55, 0.9);
+      color: #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .alert-time {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    /* PROFILE */
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .profile-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top, #0ea5e9, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .profile-name {
+      font-weight: 600;
+      font-size: 0.96rem;
+    }
+
+    .profile-tag {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .profile-badges {
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 0.68rem;
+    }
+
+    .profile-badge {
+      border-radius: 999px;
+      padding: 3px 7px;
+      background: rgba(30, 64, 175, 0.6);
+      color: #e0f2fe;
+      border: 1px solid rgba(59, 130, 246, 0.7);
+    }
+
+    .bar-row {
+      margin-top: 6px;
+    }
+
+    .bar-label {
+      font-size: 0.78rem;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2px;
+      color: var(--text-muted);
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(to right, #06b6d4, #22c55e);
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    /* COMMUNITY */
+
+    .community-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px dashed var(--border-subtle);
+    }
+
+    .community-main {
+      flex: 1;
+    }
+
+    .community-title {
+      font-weight: 600;
+      font-size: 0.88rem;
+    }
+
+    .community-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .vote-box {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .vote-btn {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 2px 6px;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      color: var(--text-muted);
+    }
+
+    .vote-count {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .community-chip {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.8);
+      color: #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      white-space: nowrap;
+    }
+
+    .community-add {
+      margin-top: 8px;
+      font-size: 0.78rem;
+    }
+
+    /* FOOTER */
+
+    .footer {
+      padding: 8px 12px 10px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .reset-btn {
+      border: none;
+      background: none;
+      color: var(--danger);
+      cursor: pointer;
+      text-decoration: underline dotted;
+      text-underline-offset: 2px;
+      font-size: 0.7rem;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 12px 8px 18px;
+      }
+      .app {
+        border-radius: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="header-row">
+        <div class="logo-row">
+          <div class="logo-mark">₿</div>
+          <div>
+            <div class="logo-text-main">BankrollBot Studio</div>
+            <div class="logo-text-sub">Simulation · Coaching · Control</div>
+          </div>
+        </div>
+        <div class="badge">SIMULATION ONLY</div>
+      </div>
+      <div class="header-subrow">
+        <div class="header-subrow-left">
+          Edge awareness + guardrails, without touching real money.
+        </div>
+        <div class="header-subrow-right">
+          <div class="pill">
+            <span id="dateDisplay"></span>
+          </div>
+          <div class="pill">
+            Bankroll:
+            <span class="value" id="bankrollChip">$2,500</span>
+          </div>
+          <div class="pill">
+            Unit:
+            <span class="value" id="unitChip">1u = $25</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- NAV TABS -->
+    <nav class="tabs">
+      <button class="tab-btn active" data-screen="home">
+        <span class="icon">📊</span>
+        Home
+      </button>
+      <button class="tab-btn" data-screen="analyzer">
+        <span class="icon">🧮</span>
+        Analyzer
+      </button>
+      <button class="tab-btn" data-screen="planner">
+        <span class="icon">⏱️</span>
+        Planner
+      </button>
+      <button class="tab-btn" data-screen="profile">
+        <span class="icon">🎚️</span>
+        Profile
+      </button>
+      <button class="tab-btn" data-screen="community">
+        <span class="icon">👥</span>
+        Social
+      </button>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="content">
+      <!-- HOME -->
+      <section id="screen-home" class="screen active">
+        <p class="tagline">
+          Track demo bets, monitor hit rate, and see how different risk modes would treat your bankroll.
+        </p>
+
+        <div class="section-title">Session snapshot (last 30 logged demo bets)</div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Current run</div>
+              <div class="card-subtitle" id="runSubtitle">No bets logged yet.</div>
+            </div>
+            <div class="chip" id="riskModeChip">Risk: Standard</div>
+          </div>
+
+          <div class="mini-metric-row">
+            <div>
+              <div class="mini-metric-label">Hit rate</div>
+              <div class="mini-metric-value" id="hitRateValue">–</div>
+              <div class="mini-metric-sub" id="hitRateSub">Needs data</div>
+            </div>
+            <div>
+              <div class="mini-metric-label">Net units</div>
+              <div class="mini-metric-value" id="netUnitsValue">0.0u</div>
+              <div class="mini-metric-sub" id="netUnitsSub">Demo only</div>
+            </div>
+            <div>
+              <div class="mini-metric-label">Bankroll drift</div>
+              <div class="mini-metric-value" id="bankrollDriftValue">$0</div>
+              <div class="mini-metric-sub" id="bankrollDriftSub">vs start</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">Quick demo bet</div>
+        <div class="card">
+          <div class="form-group">
+            <label class="form-label" for="quickLeague">League</label>
+            <select id="quickLeague">
+              <option value="NBA">NBA</option>
+              <option value="NFL">NFL</option>
+              <option value="UCL">UCL</option>
+              <option value="NHL">NHL</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="quickMatch">Match / context</label>
+            <input id="quickMatch" placeholder="e.g. PHX @ DEN" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="quickMarket">Market / prop</label>
+            <input id="quickMarket" placeholder="e.g. Durant o29.5 pts" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="quickOdds">Odds (American)</label>
+              <input id="quickOdds" type="number" placeholder="-110" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="quickUnits">Stake (units)</label>
+              <input id="quickUnits" type="number" min="0.1" step="0.1" placeholder="1.0" />
+            </div>
+          </div>
+
+          <button class="btn-primary" id="quickAddBtn">
+            <span>➕</span> Log demo bet
+          </button>
+        </div>
+
+        <div class="section-title">Recent demo bets</div>
+        <div class="card">
+          <div class="card-subtitle">Mark as win/loss to see hit rate and units move.</div>
+          <div class="bet-list" id="betList"></div>
+        </div>
+      </section>
+
+      <!-- ANALYZER -->
+      <section id="screen-analyzer" class="screen">
+        <div class="hint">
+          Paste the bet idea and <strong>your own estimated chance</strong>. The tool compares your probability to the implied probability from the odds and shows rough EV.%<br>
+          It’s not a real model – just practice thinking in probabilities.
+        </div>
+
+        <div class="card">
+          <div class="form-group">
+            <label class="form-label" for="betText">Bet details</label>
+            <textarea id="betText" placeholder="Example: NBA – PHX vs DEN, Durant o29.5 pts"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="analyzerOdds">Odds (American)</label>
+              <input id="analyzerOdds" type="number" placeholder="-110" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="analyzerProb">Your estimated chance (%)</label>
+              <input id="analyzerProb" type="number" min="1" max="99" placeholder="e.g. 55" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="analyzerUnits">Stake (units, demo)</label>
+              <input id="analyzerUnits" type="number" min="0.1" step="0.1" placeholder="1.0" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="analyzerConfidence">How sure are you?</label>
+              <select id="analyzerConfidence">
+                <option value="low">Not very (sanity check)</option>
+                <option value="medium">Reasonably sure</option>
+                <option value="high">“Lock” vibes</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="analyzeBtn">
+            <span>🧮</span> Run EV check
+          </button>
+
+          <div class="analyzer-result" id="analyzerResult" style="display:none;">
+            <div id="analyzerBadge"></div>
+
+            <div class="analyzer-grid">
+              <div>
+                <div class="analyzer-metric-label">Implied win rate</div>
+                <div class="analyzer-metric-value" id="impliedProbValue">–</div>
+              </div>
+              <div>
+                <div class="analyzer-metric-label">Your win rate</div>
+                <div class="analyzer-metric-value" id="yourProbValue">–</div>
+              </div>
+              <div>
+                <div class="analyzer-metric-label">EV on stake</div>
+                <div class="analyzer-metric-value" id="evValue">–</div>
+              </div>
+            </div>
+
+            <div class="analyzer-text" id="analyzerText"></div>
+
+            <button class="btn-ghost" id="sendToLogBtn">
+              Send as demo bet on Home
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PLANNER -->
+      <section id="screen-planner" class="screen">
+        <div class="hint">
+          This is where you set <strong>guardrails and session intentions</strong>. It’s about protecting your future self, not chasing action.
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Guardrails</div>
+              <div class="card-subtitle">These are just reminders – the app can’t touch any real money.</div>
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-label">
+              <strong>Stop-loss reminder</strong><br />
+              Ping yourself if simulated loss hits a threshold.
+            </div>
+            <div>
+              <div class="toggle-switch" id="toggleStopLoss"></div>
+              <input
+                id="stopLossInput"
+                type="number"
+                placeholder="-5u"
+                style="width:60px; margin-top:4px; font-size:0.75rem; text-align:center;"
+              />
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-label">
+              <strong>Max bets per session</strong><br />
+              Limit decisions to avoid autopilot spraying.
+            </div>
+            <div>
+              <div class="toggle-switch" id="toggleMaxBets"></div>
+              <input
+                id="maxBetsInput"
+                type="number"
+                placeholder="5"
+                style="width:60px; margin-top:4px; font-size:0.75rem; text-align:center;"
+              />
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-label">
+              <strong>Tilt warning</strong><br />
+              Reminder after 2+ losses in a row to slow down.
+            </div>
+            <div class="toggle-switch on" id="toggleTilt"></div>
+          </div>
+        </div>
+
+        <div class="section-title">Simulated line movement</div>
+        <div class="card">
+          <div class="card-subtitle">
+            In a real build this would stream from a backend. Here it’s just a flavour feed.
+          </div>
+          <div class="alert-list" id="alertsList"></div>
+        </div>
+      </section>
+
+      <!-- PROFILE -->
+      <section id="screen-profile" class="screen">
+        <div class="card">
+          <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">BB</div>
+            <div>
+              <div class="profile-name" id="profileName">Your profile</div>
+              <div class="profile-tag">Set bankroll, unit size, and risk mode.</div>
+              <div class="profile-badges">
+                <span class="profile-badge" id="badgeMode">Standard risk</span>
+                <span class="profile-badge">Sim player</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="profileNameInput">Name / alias</label>
+            <input id="profileNameInput" placeholder="e.g. Sean" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="bankrollInput">Demo bankroll ($)</label>
+              <input id="bankrollInput" type="number" placeholder="2500" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="unitInput">Unit size ($)</label>
+              <input id="unitInput" type="number" placeholder="25" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="riskModeSelect">Risk mode</label>
+            <select id="riskModeSelect">
+              <option value="chill">Chill (0.25–0.5u typical)</option>
+              <option value="standard">Standard (0.5–1u)</option>
+              <option value="aggressive">Aggressive (1–2u)</option>
+            </select>
+          </div>
+
+          <button class="btn-primary" id="saveProfileBtn">
+            <span>💾</span> Save profile
+          </button>
+
+          <div class="bar-row">
+            <div class="bar-label">
+              <span>Bankroll health (demo)</span>
+              <span id="bankrollHealthLabel">Neutral</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" id="bankrollHealthBar"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMMUNITY -->
+      <section id="screen-community" class="screen">
+        <div class="hint">
+          Local-only “crowd picks” board. Vote and add plays – nothing leaves your device.
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Today’s board</div>
+              <div class="card-subtitle">Upvote what you like, ignore what you don’t.</div>
+            </div>
+          </div>
+          <div id="communityList"></div>
+        </div>
+
+        <div class="card community-add">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Add your own pick (local)</div>
+              <div class="card-subtitle">Purely for practice and vibes.</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="communityPickInput">Pick text</label>
+            <input id="communityPickInput" placeholder="e.g. NBA · HOU +6.5 vs LAL" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="communityNoteInput">Short note</label>
+            <input id="communityNoteInput" placeholder="Why you like it (1 sentence)" />
+          </div>
+
+          <button class="btn-primary" id="addCommunityBtn">
+            <span>➕</span> Add to local board
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div>
+        Local-only demo · no real bets, no accounts, no data sent anywhere.
+      </div>
+      <button class="reset-btn" id="resetAllBtn">reset everything</button>
+    </footer>
+  </div>
+
+  <script>
+    // ------------------- STORAGE & STATE -------------------
+    const STORAGE_KEY = "bankrollBotStudio_state_v1";
+
+    const defaultState = {
+      bankroll: 2500,
+      unitSize: 25,
+      riskMode: "standard",
+      username: "",
+      bets: [], // {id, league, match, market, odds, units, result, createdAt}
+      guardrails: {
+        stopLossOn: false,
+        stopLossUnits: -5,
+        maxBetsOn: false,
+        maxBets: 5,
+        tiltOn: true
+      }
+    };
+
+    let state = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return { ...defaultState };
+        const parsed = JSON.parse(raw);
+        return {
+          ...defaultState,
+          ...parsed,
+          guardrails: {
+            ...defaultState.guardrails,
+            ...(parsed.guardrails || {})
+          }
+        };
+      } catch {
+        return { ...defaultState };
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      updateHeaderChips();
+      updateHomeStats();
+      updateProfileUI();
+    }
+
+    function resetState() {
+      state = { ...defaultState, bets: [] };
+      saveState();
+      renderBets();
+      renderCommunity();
+      renderAlerts();
+      alert("Demo reset. Fresh slate.");
+    }
+
+    // ------------------- UTILITIES -------------------
+    function formatDate() {
+      const d = new Date();
+      return d.toLocaleDateString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric"
+      });
+    }
+
+    function formatMoney(amount) {
+      const sign = amount < 0 ? "-" : "";
+      const abs = Math.abs(amount);
+      return sign + "$" + abs.toFixed(0);
+    }
+
+    function americanToDecimal(odds) {
+      if (odds > 0) return 1 + odds / 100;
+      return 1 + 100 / Math.abs(odds);
+    }
+
+    function americanToImpliedProb(odds) {
+      if (odds > 0) return 100 / (odds + 100);
+      return Math.abs(odds) / (Math.abs(odds) + 100);
+    }
+
+    function impliedProbToPct(prob) {
+      return (prob * 100).toFixed(1) + "%";
+    }
+
+    function computeHitRateAndUnits(bets) {
+      const considered = bets.slice(-30);
+      if (considered.length === 0) {
+        return {
+          hitRate: null,
+          netUnits: 0,
+          wins: 0,
+          losses: 0
+        };
+      }
+      let wins = 0;
+      let losses = 0;
+      let netUnits = 0;
+      for (const b of considered) {
+        if (b.result === "win") {
+          wins++;
+          const dec = americanToDecimal(b.odds);
+          const profitUnits = (dec - 1) * b.units;
+          netUnits += profitUnits;
+        } else if (b.result === "loss") {
+          losses++;
+          netUnits -= b.units;
+        }
+      }
+      const resolved = wins + losses;
+      const hitRate = resolved ? (wins / resolved) * 100 : null;
+      return { hitRate, netUnits, wins, losses };
+    }
+
+    function getTiltStreak(bets) {
+      let streak = 0;
+      for (let i = bets.length - 1; i >= 0; i--) {
+        if (bets[i].result === "loss") {
+          streak++;
+        } else if (bets[i].result === "win") {
+          break;
+        }
+      }
+      return streak;
+    }
+
+    // ------------------- HEADER -------------------
+    const dateDisplayEl = document.getElementById("dateDisplay");
+    const bankrollChipEl = document.getElementById("bankrollChip");
+    const unitChipEl = document.getElementById("unitChip");
+
+    function updateHeaderChips() {
+      dateDisplayEl.textContent = formatDate();
+      bankrollChipEl.textContent = "$" + state.bankroll.toFixed(0);
+      unitChipEl.textContent = `1u = $${state.unitSize.toFixed(0)}`;
+    }
+
+    // ------------------- NAV -------------------
+    const tabs = document.querySelectorAll(".tab-btn");
+    const screens = document.querySelectorAll(".screen");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const target = tab.getAttribute("data-screen");
+
+        tabs.forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        screens.forEach((s) => {
+          if (s.id === "screen-" + target) s.classList.add("active");
+          else s.classList.remove("active");
+        });
+      });
+    });
+
+    // ------------------- HOME (DEMO BETS) -------------------
+    const riskModeChip = document.getElementById("riskModeChip");
+    const runSubtitleEl = document.getElementById("runSubtitle");
+    const hitRateValueEl = document.getElementById("hitRateValue");
+    const hitRateSubEl = document.getElementById("hitRateSub");
+    const netUnitsValueEl = document.getElementById("netUnitsValue");
+    const netUnitsSubEl = document.getElementById("netUnitsSub");
+    const bankrollDriftValueEl = document.getElementById("bankrollDriftValue");
+    const bankrollDriftSubEl = document.getElementById("bankrollDriftSub");
+    const betListEl = document.getElementById("betList");
+
+    function getRiskLabel(mode) {
+      if (mode === "chill") return "Risk: Chill";
+      if (mode === "aggressive") return "Risk: Aggressive";
+      return "Risk: Standard";
+    }
+
+    function getRiskSubtitle(mode) {
+      if (mode === "chill") return "0.25–0.5u stakes recommended.";
+      if (mode === "aggressive") return "1–2u stakes, higher swings.";
+      return "0.5–1u stakes, balanced.";
+    }
+
+    function updateHomeStats() {
+      riskModeChip.textContent = getRiskLabel(state.riskMode);
+
+      const bets = state.bets;
+      const last30 = bets.slice(-30);
+      if (last30.length === 0) {
+        runSubtitleEl.textContent = "No bets logged yet. Everything here is simulated.";
+        hitRateValueEl.textContent = "–";
+        hitRateSubEl.textContent = "Log a few demo bets.";
+        netUnitsValueEl.textContent = "0.0u";
+        netUnitsSubEl.textContent = "Needs outcomes.";
+        bankrollDriftValueEl.textContent = "$0";
+        bankrollDriftSubEl.textContent = "vs starting bankroll.";
+        return;
+      }
+
+      runSubtitleEl.textContent = `${last30.length} demo bets tracked (last 30).`;
+
+      const { hitRate, netUnits, wins, losses } = computeHitRateAndUnits(bets);
+      if (hitRate === null) {
+        hitRateValueEl.textContent = "–";
+        hitRateSubEl.textContent = "Mark some results.";
+      } else {
+        hitRateValueEl.textContent = hitRate.toFixed(1) + "%";
+        hitRateSubEl.textContent = `${wins}W / ${losses}L last 30.`;
+      }
+
+      netUnitsValueEl.textContent = (netUnits >= 0 ? "+" : "") + netUnits.toFixed(1) + "u";
+      netUnitsSubEl.textContent = "Based on marked win/loss.";
+
+      const bankrollDrift = netUnits * state.unitSize;
+      bankrollDriftValueEl.textContent = formatMoney(bankrollDrift);
+      bankrollDriftSubEl.textContent =
+        bankrollDrift === 0 ? "Neutral vs starting bankroll." :
+        bankrollDrift > 0 ? "Bankroll would be up." : "Bankroll would be down.";
+
+      // Tilt guardrail message (planner)
+      if (state.guardrails.tiltOn) {
+        const tilt = getTiltStreak(bets);
+        if (tilt >= 2) {
+          hitRateSubEl.textContent += " Tilt warning: 2+ losses in a row – consider slowing down.";
+        }
+      }
+    }
+
+    function renderBets() {
+      betListEl.innerHTML = "";
+      const bets = state.bets.slice().reverse(); // show newest first
+
+      if (bets.length === 0) {
+        const empty = document.createElement("div");
+        empty.style.fontSize = "0.78rem";
+        empty.style.color = "var(--text-muted)";
+        empty.style.marginTop = "4px";
+        empty.textContent = "No demo bets yet. Add one above.";
+        betListEl.appendChild(empty);
+        return;
+      }
+
+      bets.forEach((b) => {
+        const row = document.createElement("div");
+        row.className = "bet-row";
+
+        const main = document.createElement("div");
+        main.className = "bet-main";
+
+        const title = document.createElement("div");
+        title.className = "bet-title";
+        title.textContent = `${b.league || "Bet"} – ${b.market || ""}`;
+
+        const sub = document.createElement("div");
+        sub.className = "bet-sub";
+        sub.textContent = (b.match || "") + (b.match && b.odds ? " · " : "") + (b.odds ? `Odds ${b.odds}` : "");
+
+        const meta = document.createElement("div");
+        meta.className = "bet-meta";
+        const created = new Date(b.createdAt);
+        const timeStr = created.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+        meta.textContent = `${b.units.toFixed(1)}u · logged ${timeStr}`;
+
+        main.appendChild(title);
+        main.appendChild(sub);
+        main.appendChild(meta);
+
+        const actions = document.createElement("div");
+        actions.className = "bet-actions";
+
+        const status = document.createElement("div");
+        status.className = "status-pill";
+        if (b.result === "win") status.classList.add("win");
+        if (b.result === "loss") status.classList.add("loss");
+        status.textContent =
+          b.result === "win" ? "Win" :
+          b.result === "loss" ? "Loss" :
+          "Pending";
+
+        const btnWin = document.createElement("button");
+        btnWin.className = "tiny-btn win";
+        btnWin.textContent = "Mark W";
+        btnWin.addEventListener("click", () => {
+          b.result = "win";
+          saveState();
+          renderBets();
+        });
+
+        const btnLoss = document.createElement("button");
+        btnLoss.className = "tiny-btn loss";
+        btnLoss.textContent = "Mark L";
+        btnLoss.addEventListener("click", () => {
+          b.result = "loss";
+          saveState();
+          renderBets();
+        });
+
+        actions.appendChild(status);
+        actions.appendChild(btnWin);
+        actions.appendChild(btnLoss);
+
+        row.appendChild(main);
+        row.appendChild(actions);
+        betListEl.appendChild(row);
+      });
+    }
+
+    // Quick add demo bet
+    const quickLeagueEl = document.getElementById("quickLeague");
+    const quickMatchEl = document.getElementById("quickMatch");
+    const quickMarketEl = document.getElementById("quickMarket");
+    const quickOddsEl = document.getElementById("quickOdds");
+    const quickUnitsEl = document.getElementById("quickUnits");
+    const quickAddBtn = document.getElementById("quickAddBtn");
+
+    quickAddBtn.addEventListener("click", () => {
+      const league = quickLeagueEl.value || "Other";
+      const match = (quickMatchEl.value || "").trim();
+      const market = (quickMarketEl.value || "").trim();
+      const odds = parseFloat(quickOddsEl.value);
+      const units = parseFloat(quickUnitsEl.value || "1");
+
+      if (!market) {
+        alert("Give the demo bet a market / prop name.");
+        return;
+      }
+      const finalOdds = isNaN(odds) ? -110 : odds;
+
+      const id = "bet-" + Date.now().toString(36);
+      const bet = {
+        id,
+        league,
+        match,
+        market,
+        odds: finalOdds,
+        units: units > 0 ? units : 1,
+        result: "pending",
+        createdAt: Date.now()
+      };
+      state.bets.push(bet);
+      saveState();
+      renderBets();
+      applyGuardrailChecks();
+    });
+
+    function applyGuardrailChecks() {
+      const bets = state.bets;
+      const { netUnits } = computeHitRateAndUnits(bets);
+
+      // Stop-loss
+      if (state.guardrails.stopLossOn && netUnits <= state.guardrails.stopLossUnits) {
+        alert(
+          `Stop-loss reminder: you’re at ${netUnits.toFixed(
+            1
+          )}u in this demo.\n\nThis is where you planned to step away.`
+        );
+      }
+
+      // Max bets
+      if (state.guardrails.maxBetsOn && bets.length >= state.guardrails.maxBets) {
+        alert(
+          `Max bets reminder: you planned for ${state.guardrails.maxBets} demo decisions.\n\nYou’ve reached that number.`
+        );
+      }
+
+      // Tilt handled in updateHomeStats via getTiltStreak
+      updateHomeStats();
+    }
+
+    // ------------------- ANALYZER -------------------
+    const analyzerOddsEl = document.getElementById("analyzerOdds");
+    const analyzerProbEl = document.getElementById("analyzerProb");
+    const analyzerUnitsEl = document.getElementById("analyzerUnits");
+    const analyzerConfidenceEl = document.getElementById("analyzerConfidence");
+    const analyzerResultEl = document.getElementById("analyzerResult");
+    const analyzerBadgeEl = document.getElementById("analyzerBadge");
+    const analyzerTextEl = document.getElementById("analyzerText");
+    const impliedProbValueEl = document.getElementById("impliedProbValue");
+    const yourProbValueEl = document.getElementById("yourProbValue");
+    const evValueEl = document.getElementById("evValue");
+    const betTextEl = document.getElementById("betText");
+    const analyzeBtnEl = document.getElementById("analyzeBtn");
+    const sendToLogBtn = document.getElementById("sendToLogBtn");
+
+    function analyzeBet() {
+      const betText = (betTextEl.value || "").trim();
+      let odds = parseFloat(analyzerOddsEl.value);
+      let probPct = parseFloat(analyzerProbEl.value);
+      let units = parseFloat(analyzerUnitsEl.value || "1");
+      const confidence = analyzerConfidenceEl.value;
+
+      if (!betText) {
+        alert("Describe the bet first.");
+        return;
+      }
+      if (isNaN(odds)) odds = -110;
+      if (isNaN(probPct) || probPct <= 0 || probPct >= 100) {
+        alert("Set your estimated chance between 1 and 99%.");
+        return;
+      }
+
+      if (units <= 0) units = 1;
+
+      const implied = americanToImpliedProb(odds);
+      const yourProb = probPct / 100;
+
+      // EV as percentage of stake
+      // EV = (p*profit - (1-p)*stake)/stake
+      const dec = americanToDecimal(odds);
+      const profitPerUnit = dec - 1;
+      const evPerUnit = yourProb * profitPerUnit - (1 - yourProb) * 1;
+      const evPercent = evPerUnit * 100;
+
+      analyzerResultEl.style.display = "block";
+
+      impliedProbValueEl.textContent = impliedProbToPct(implied);
+      yourProbValueEl.textContent = (yourProb * 100).toFixed(1) + "%";
+      evValueEl.textContent = (evPercent >= 0 ? "+" : "") + evPercent.toFixed(1) + "%";
+
+      analyzerBadgeEl.innerHTML = "";
+      const badge = document.createElement("div");
+      const positive = evPerUnit > 0.02; // > +2% edge
+      badge.className = "analyzer-badge " + (positive ? "good" : "bad");
+      badge.textContent = positive
+        ? "Toy math says this looks +EV (in theory)"
+        : "Toy math says thin/negative edge";
+
+      analyzerBadgeEl.appendChild(badge);
+
+      let narrative = "";
+      const edgeDiff = yourProb - implied;
+      const edgePct = edgeDiff * 100;
+
+      if (positive) {
+        narrative += `Your estimate is about ${edgePct.toFixed(
+          1
+        )} pts higher than the implied win rate. That suggests a theoretical edge if your read is accurate. `;
+      } else {
+        narrative += `Your estimate is not clearly above the implied win rate (diff: ${edgePct.toFixed(
+          1
+        )} pts). That usually means break-even or worse once vig is included. `;
+      }
+
+      if (confidence === "high") {
+        narrative += "High confidence is where overconfidence bites. Consider stress-testing your assumptions.";
+      } else if (confidence === "medium") {
+        narrative += "Medium confidence is a healthy place – double-check inputs but you’re thinking probabilistically.";
+      } else {
+        narrative += "Low confidence is fine – the whole point is to practice thinking in probabilities, not to fire.";
+      }
+
+      analyzerTextEl.textContent = narrative;
+
+      // Store last analysis so "send to log" can use it
+      lastAnalyzerResult = {
+        betText,
+        odds,
+        units,
+        timestamp: Date.now()
+      };
+    }
+
+    let lastAnalyzerResult = null;
+
+    analyzeBtnEl.addEventListener("click", analyzeBet);
+
+    sendToLogBtn.addEventListener("click", () => {
+      if (!lastAnalyzerResult) {
+        alert("Run an analysis first.");
+        return;
+      }
+      // Try to split betText into league / market rough
+      const text = lastAnalyzerResult.betText;
+      let league = "Other";
+      if (/nba/i.test(text)) league = "NBA";
+      else if (/nfl/i.test(text)) league = "NFL";
+      else if (/ucl/i.test(text)) league = "UCL";
+      else if (/nhl/i.test(text)) league = "NHL";
+
+      const bet = {
+        id: "bet-" + Date.now().toString(36),
+        league,
+        match: "",
+        market: text.slice(0, 60),
+        odds: lastAnalyzerResult.odds,
+        units: lastAnalyzerResult.units,
+        result: "pending",
+        createdAt: Date.now()
+      };
+
+      state.bets.push(bet);
+      saveState();
+      renderBets();
+      applyGuardrailChecks();
+      alert("Analysis sent as a demo bet on Home.");
+    });
+
+    // ------------------- PLANNER / ALERTS -------------------
+    const toggleStopLossEl = document.getElementById("toggleStopLoss");
+    const stopLossInputEl = document.getElementById("stopLossInput");
+    const toggleMaxBetsEl = document.getElementById("toggleMaxBets");
+    const maxBetsInputEl = document.getElementById("maxBetsInput");
+    const toggleTiltEl = document.getElementById("toggleTilt");
+    const alertsListEl = document.getElementById("alertsList");
+
+    const mockAlerts = [
+      {
+        league: "NBA",
+        title: "Line move on star assists",
+        detail: "Assist line shifted from 6.5 to 5.5 after rest news.",
+        tags: ["+EV window?", "Short-lived"],
+        time: "3 min ago"
+      },
+      {
+        league: "NFL",
+        title: "Wind flag in CLE game",
+        detail: "Forecast upgraded; totals ticking down 1–1.5 pts.",
+        tags: ["Totals", "Weather"],
+        time: "11 min ago"
+      },
+      {
+        league: "UCL",
+        title: "Late lineup change",
+        detail: "Attacking mid benched; model leans slightly under on team total.",
+        tags: ["Props", "Lineups"],
+        time: "24 min ago"
+      }
+    ];
+
+    function renderAlerts() {
+      alertsListEl.innerHTML = "";
+      mockAlerts.forEach((a) => {
+        const row = document.createElement("div");
+        row.className = "alert-row";
+
+        const main = document.createElement("div");
+        main.className = "alert-main";
+
+        const title = document.createElement("div");
+        title.className = "alert-title";
+        title.textContent = `${a.league} – ${a.title}`;
+
+        const sub = document.createElement("div");
+        sub.className = "alert-sub";
+        sub.textContent = a.detail;
+
+        const tagRow = document.createElement("div");
+        tagRow.className = "alert-tag-row";
+
+        a.tags.forEach((t) => {
+          const chip = document.createElement("div");
+          chip.className = "alert-chip";
+          chip.textContent = t;
+          tagRow.appendChild(chip);
+        });
+
+        const time = document.createElement("div");
+        time.className = "alert-time";
+        time.textContent = a.time;
+
+        main.appendChild(title);
+        main.appendChild(sub);
+        main.appendChild(tagRow);
+        row.appendChild(main);
+        row.appendChild(time);
+        alertsListEl.appendChild(row);
+      });
+    }
+
+    function updateGuardrailUI() {
+      if (state.guardrails.stopLossOn) {
+        toggleStopLossEl.classList.add("on");
+      } else {
+        toggleStopLossEl.classList.remove("on");
+      }
+      stopLossInputEl.value = state.guardrails.stopLossUnits;
+
+      if (state.guardrails.maxBetsOn) {
+        toggleMaxBetsEl.classList.add("on");
+      } else {
+        toggleMaxBetsEl.classList.remove("on");
+      }
+      maxBetsInputEl.value = state.guardrails.maxBets;
+
+      if (state.guardrails.tiltOn) {
+        toggleTiltEl.classList.add("on");
+      } else {
+        toggleTiltEl.classList.remove("on");
+      }
+    }
+
+    toggleStopLossEl.addEventListener("click", () => {
+      state.guardrails.stopLossOn = !state.guardrails.stopLossOn;
+      saveState();
+      updateGuardrailUI();
+    });
+
+    stopLossInputEl.addEventListener("change", () => {
+      const val = parseFloat(stopLossInputEl.value);
+      if (isNaN(val)) return;
+      state.guardrails.stopLossUnits = val;
+      saveState();
+    });
+
+    toggleMaxBetsEl.addEventListener("click", () => {
+      state.guardrails.maxBetsOn = !state.guardrails.maxBetsOn;
+      saveState();
+      updateGuardrailUI();
+    });
+
+    maxBetsInputEl.addEventListener("change", () => {
+      const val = parseInt(maxBetsInputEl.value, 10);
+      if (isNaN(val) || val <= 0) return;
+      state.guardrails.maxBets = val;
+      saveState();
+    });
+
+    toggleTiltEl.addEventListener("click", () => {
+      state.guardrails.tiltOn = !state.guardrails.tiltOn;
+      saveState();
+      updateGuardrailUI();
+    });
+
+    // ------------------- PROFILE -------------------
+    const profileAvatarEl = document.getElementById("profileAvatar");
+    const profileNameEl = document.getElementById("profileName");
+    const profileNameInputEl = document.getElementById("profileNameInput");
+    const bankrollInputEl = document.getElementById("bankrollInput");
+    const unitInputEl = document.getElementById("unitInput");
+    const riskModeSelectEl = document.getElementById("riskModeSelect");
+    const saveProfileBtnEl = document.getElementById("saveProfileBtn");
+    const badgeModeEl = document.getElementById("badgeMode");
+    const bankrollHealthLabelEl = document.getElementById("bankrollHealthLabel");
+    const bankrollHealthBarEl = document.getElementById("bankrollHealthBar");
+
+    function initialsFromName(name) {
+      if (!name) return "BB";
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+
+    function updateProfileUI() {
+      profileNameInputEl.value = state.username;
+      bankrollInputEl.value = state.bankroll;
+      unitInputEl.value = state.unitSize;
+      riskModeSelectEl.value = state.riskMode;
+
+      profileAvatarEl.textContent = initialsFromName(state.username);
+      profileNameEl.textContent = state.username ? `${state.username}'s profile` : "Your profile";
+      badgeModeEl.textContent = getRiskLabel(state.riskMode);
+
+      // Bankroll health: just derive from netUnits
+      const { netUnits } = computeHitRateAndUnits(state.bets);
+      const drift = netUnits * state.unitSize;
+      let label = "Neutral";
+      let pct = 50;
+      if (drift > 0) {
+        label = "Up demo";
+        pct = Math.min(100, 50 + drift / (state.bankroll * 0.05) * 50); // scale vs 5% of bankroll
+      } else if (drift < 0) {
+        label = "Down demo";
+        pct = Math.max(0, 50 + drift / (state.bankroll * 0.05) * 50);
+      }
+      bankrollHealthLabelEl.textContent = label;
+      bankrollHealthBarEl.style.width = pct + "%";
+    }
+
+    saveProfileBtnEl.addEventListener("click", () => {
+      const name = (profileNameInputEl.value || "").trim();
+      let bankroll = parseFloat(bankrollInputEl.value);
+      let unitSize = parseFloat(unitInputEl.value);
+      const riskMode = riskModeSelectEl.value;
+
+      if (isNaN(bankroll) || bankroll <= 0) bankroll = 2500;
+      if (isNaN(unitSize) || unitSize <= 0) unitSize = 25;
+
+      state.username = name;
+      state.bankroll = bankroll;
+      state.unitSize = unitSize;
+      state.riskMode = riskMode;
+      saveState();
+      alert("Profile saved locally.");
+    });
+
+    // ------------------- COMMUNITY -------------------
+    const communityListEl = document.getElementById("communityList");
+    const communityPickInputEl = document.getElementById("communityPickInput");
+    const communityNoteInputEl = document.getElementById("communityNoteInput");
+    const addCommunityBtnEl = document.getElementById("addCommunityBtn");
+
+    let communityItems = [
+      {
+        id: "c1",
+        user: "SharpSprout",
+        pick: "NBA · HOU +6.5 vs LAL",
+        note: "Model has this closer to +3.9, tiny dog lean.",
+        ev: "+2.1% EV (sim)",
+        up: 14,
+        down: 3
+      },
+      {
+        id: "c2",
+        user: "UnitFarmer",
+        pick: "NFL · Anytime TD: Kelce",
+        note: "Price dipped a bit; target share still elite.",
+        ev: "+1.3% EV (high variance)",
+        up: 22,
+        down: 9
+      },
+      {
+        id: "c3",
+        user: "ProbEdge",
+        pick: "UCL · o2.5 goals in BVB vs PSG",
+        note: "Both top 10 in xG; tempo-friendly styles.",
+        ev: "+3.4% EV (sim)",
+        up: 31,
+        down: 5
+      }
+    ];
+
+    function renderCommunity() {
+      communityListEl.innerHTML = "";
+      communityItems.forEach((item) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "community-item";
+
+        const chip = document.createElement("div");
+        chip.className = "community-chip";
+        chip.textContent = item.user;
+
+        const main = document.createElement("div");
+        main.className = "community-main";
+
+        const title = document.createElement("div");
+        title.className = "community-title";
+        title.textContent = item.pick;
+
+        const meta = document.createElement("div");
+        meta.className = "community-meta";
+        meta.textContent = item.ev;
+
+        const note = document.createElement("div");
+        note.style.fontSize = "0.8rem";
+        note.textContent = item.note;
+
+        const votes = document.createElement("div");
+        votes.className = "vote-box";
+
+        const upBtn = document.createElement("button");
+        upBtn.className = "vote-btn";
+        upBtn.textContent = "👍";
+
+        const downBtn = document.createElement("button");
+        downBtn.className = "vote-btn";
+        downBtn.textContent = "👎";
+
+        const count = document.createElement("div");
+        count.className = "vote-count";
+
+        function updateCount() {
+          count.textContent = `${item.up} up · ${item.down} down`;
+        }
+        updateCount();
+
+        upBtn.addEventListener("click", () => {
+          item.up += 1;
+          updateCount();
+        });
+
+        downBtn.addEventListener("click", () => {
+          item.down += 1;
+          updateCount();
+        });
+
+        votes.appendChild(upBtn);
+        votes.appendChild(downBtn);
+        votes.appendChild(count);
+
+        main.appendChild(title);
+        main.appendChild(meta);
+        main.appendChild(note);
+        main.appendChild(votes);
+
+        wrapper.appendChild(chip);
+        wrapper.appendChild(main);
+        communityListEl.appendChild(wrapper);
+      });
+    }
+
+    addCommunityBtnEl.addEventListener("click", () => {
+      const pick = (communityPickInputEl.value || "").trim();
+      const note = (communityNoteInputEl.value || "").trim();
+      if (!pick) {
+        alert("Add at least a pick description.");
+        return;
+      }
+      const item = {
+        id: "c-" + Date.now().toString(36),
+        user: state.username || "You",
+        pick,
+        note: note || "No note added.",
+        ev: "EV not rated (local)",
+        up: 0,
+        down: 0
+      };
+      communityItems.unshift(item);
+      communityPickInputEl.value = "";
+      communityNoteInputEl.value = "";
+      renderCommunity();
+    });
+
+    // ------------------- RESET BUTTON -------------------
+    document.getElementById("resetAllBtn").addEventListener("click", () => {
+      if (!confirm("Reset all local demo data and profile settings?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      resetState();
+    });
+
+    // ------------------- INIT -------------------
+    (function init() {
+      updateHeaderChips();
+      renderBets();
+      updateHomeStats();
+      renderAlerts();
+      updateGuardrailUI();
+      updateProfileUI();
+      renderCommunity();
+    })();
+  </script>
+</body>
+</html>
